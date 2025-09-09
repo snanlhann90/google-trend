@@ -1,12 +1,11 @@
-// Apify Actor: Google Trends Scraper (Daily & Realtime)
+// Apify Actor: Google Trends Scraper (Daily & Realtime) — Apify v3 (Actor API)
 // Çalışma mantığı: DOM kazımak yerine Google Trends'in JSON API uçlarını çağırır,
 // )]}', önekinı temizleyip güvenli biçimde parse eder, normalize edip Dataset'e yazar.
 
-import Apify from 'apify';
+import { Actor } from 'apify';
 import { gotScraping } from 'got-scraping';
 
 const stripJsonPrefix = (raw) => {
-  // Google Trends API çoğu yanıta )]}', öneki ekler — bunu temizleyelim
   if (typeof raw !== 'string') return raw;
   const prefix = ")]}',";
   return raw.startsWith(prefix) ? raw.slice(prefix.length) : raw;
@@ -30,31 +29,24 @@ const fetchJson = async (url, headers = {}) => {
 };
 
 const normalizeRealtime = (json) => {
-  // Kaynak: /trends/api/realtimetrends yanıtındaki yapı
-  // Ör. json.storySummaries.trendingStories[]
   const out = [];
   const stories = json?.storySummaries?.trendingStories ?? [];
-
   for (const s of stories) {
     const title = s?.title ?? s?.entityNames?.[0] ?? null;
     const shareUrl = s?.shareUrl ?? null;
-
-    // Görseller
     const image = s?.image?.imageUrl ?? s?.image?.newsUrl ?? null;
 
-    // İlgili makaleler
     const articles = (s?.articles ?? []).map((a) => ({
       title: a?.title ?? null,
       url: a?.url ?? null,
       source: a?.source ?? null,
-      time: a?.time ?? null, // ISO olmayabilir; olduğu gibi bırakıyoruz
+      time: a?.time ?? null,
       snippet: a?.snippet ?? null,
       image: a?.image?.imageUrl ?? null,
     }));
 
-    // İlgili varlıklar (entity) ve skorlar
     const entities = (s?.entityNames ?? []);
-    const score = s?.ranking?.score ?? null; // Bazı bölgelerde mevcut olmayabilir
+    const score = s?.ranking?.score ?? null;
 
     out.push({
       type: 'realtime',
@@ -72,14 +64,11 @@ const normalizeRealtime = (json) => {
 };
 
 const normalizeDaily = (json) => {
-  // Kaynak: /trends/api/dailytrends yanıtındaki yapı
-  // Ör. json.default.trendingSearchesDays[].trendingSearches[]
   const out = [];
   const days = json?.default?.trendingSearchesDays ?? [];
   for (const d of days) {
     const date = d.date ?? d.formattedDate ?? null;
     const searches = d?.trendingSearches ?? [];
-
     for (const s of searches) {
       const title = s?.title?.query ?? null;
       const shareUrl = s?.shareUrl ?? null;
@@ -118,24 +107,20 @@ const normalizeDaily = (json) => {
   return out;
 };
 
-Apify.main(async () => {
-  const input = await Apify.getInput();
-
+await Actor.main(async () => {
+  const input = await Actor.getInput();
   const {
-    // Genel
-    mode = 'realtime', // "realtime" veya "daily"
-    geo = 'TR',        // Ülke kodu (örn: TR, US, DE...)
-    hl = 'tr',         // Dil (örn: tr, en, de...)
-    tz = 180,          // Dakika cinsinden timezone offset (TR için +03:00 => 180)
-    // Realtime parametreleri
-    category = 'all',  // Kategori: 'all' genelde iyi bir varsayılan
-    recordsPerInterval = 300, // ri
-    recentSeconds = 20,       // rs
-    // Daily parametreleri (çoğu durumda sadece temel parametreler yeterli)
+    mode = 'realtime',
+    geo = 'TR',
+    hl = 'tr',
+    tz = 180,
+    category = 'all',
+    recordsPerInterval = 300,
+    recentSeconds = 20,
   } = input || {};
 
-  const kv = await Apify.openKeyValueStore();
-  const dataset = await Apify.openDataset();
+  const kv = await Actor.openKeyValueStore();
+  const dataset = await Actor.openDataset();
 
   if (mode === 'realtime') {
     const url = `https://trends.google.com/trends/api/realtimetrends?hl=${encodeURIComponent(
@@ -148,22 +133,14 @@ Apify.main(async () => {
       recentSeconds,
     )}&sort=0`;
 
-    Apify.utils.log.info(`Fetching realtime trends: ${url}`);
+    Actor.log.info(`Fetching realtime trends: ${url}`);
     const json = await fetchJson(url);
-
     const items = normalizeRealtime(json);
-    Apify.utils.log.info(`Realtime items: ${items.length}`);
-
+    Actor.log.info(\`Realtime items: \${items.length}\`);
     if (items.length) await dataset.pushData(items);
 
     await kv.setValue('OUTPUT', {
-      mode,
-      geo,
-      hl,
-      tz,
-      category,
-      recordsPerInterval,
-      recentSeconds,
+      mode, geo, hl, tz, category, recordsPerInterval, recentSeconds,
       itemCount: items.length,
       fetchedAt: new Date().toISOString(),
       endpoint: url,
@@ -173,19 +150,14 @@ Apify.main(async () => {
       hl,
     )}&tz=${encodeURIComponent(tz)}&geo=${encodeURIComponent(geo)}&ns=15`;
 
-    Apify.utils.log.info(`Fetching daily trends: ${url}`);
+    Actor.log.info(`Fetching daily trends: ${url}`);
     const json = await fetchJson(url);
-
     const items = normalizeDaily(json);
-    Apify.utils.log.info(`Daily items: ${items.length}`);
-
+    Actor.log.info(\`Daily items: \${items.length}\`);
     if (items.length) await dataset.pushData(items);
 
     await kv.setValue('OUTPUT', {
-      mode,
-      geo,
-      hl,
-      tz,
+      mode, geo, hl, tz,
       itemCount: items.length,
       fetchedAt: new Date().toISOString(),
       endpoint: url,
@@ -194,5 +166,5 @@ Apify.main(async () => {
     throw new Error(`Geçersiz mode: ${mode}. "realtime" veya "daily" kullanın.`);
   }
 
-  Apify.utils.log.info('Done.');
+  Actor.log.info('Done.');
 });
