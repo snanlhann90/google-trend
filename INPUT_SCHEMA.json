@@ -6,48 +6,63 @@
     "mode": {
       "title": "Mode",
       "type": "string",
-      "enum": ["realtime", "daily"],
+      "enum": [
+        "realtime",
+        "daily"
+      ],
       "default": "realtime",
-      "description": "Gerçek zamanlı (realtime) trendler veya günlük (daily) trendler"
+      "description": "Gerçek zamanlı (realtime) trendler veya günlük (daily) trendler",
+      "editor": "select"
     },
     "geo": {
       "title": "Ülke (geo)",
       "type": "string",
       "default": "TR",
-      "description": "Ülke kodu (örn: TR, US, DE)"
+      "description": "Ülke kodu (örn: TR, US, DE)",
+      "editor": "textfield"
     },
     "hl": {
       "title": "Dil (hl)",
       "type": "string",
       "default": "tr",
-      "description": "Dil (örn: tr, en)"
+      "description": "Dil (örn: tr, en)",
+      "editor": "textfield"
     },
     "tz": {
       "title": "Zaman dilimi ofseti (dk)",
       "type": "integer",
       "default": 180,
-      "description": "Dakika cinsinden timezone ofseti (TR için 180)"
+      "description": "Dakika cinsinden timezone ofseti (TR için 180)",
+      "editor": "number"
     },
     "category": {
       "title": "Kategori (realtime)",
       "type": "string",
       "default": "all",
-      "description": "Realtime için kategori (genellikle 'all')"
+      "description": "Realtime için kategori (genellikle 'all')",
+      "editor": "textfield"
     },
     "recordsPerInterval": {
       "title": "Kayıt limiti (ri, realtime)",
       "type": "integer",
       "default": 300,
       "minimum": 1,
-      "description": "Realtime endpoint'inde kaç kayıt çekileceği"
+      "description": "Realtime endpoint'inde kaç kayıt çekileceği",
+      "editor": "number"
     },
     "recentSeconds": {
       "title": "Son X saniye (rs, realtime)",
       "type": "integer",
       "default": 20,
       "minimum": 1,
-      "description": "Realtime endpoint'inde zaman penceresi"
+      "description": "Realtime endpoint'inde zaman penceresi",
+      "editor": "number"
     }
   },
-  "required": ["mode", "geo", "hl", "tz"]
+  "required": [
+    "mode",
+    "geo",
+    "hl",
+    "tz"
+  ]
 }
