@@ -1,0 +1,14 @@
+{
+  "name": "apify-google-trends-scraper",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Apify Actor - Google Trends (Daily & Realtime) scraper via official JSON endpoints",
+  "scripts": {
+    "start": "node main.js",
+    "test": "node -e \"console.log('No tests yet')\""
+  },
+  "dependencies": {
+    "apify": "^3.1.9",
+    "got-scraping": "^4.0.4"
+  }
+}

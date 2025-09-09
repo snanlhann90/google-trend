@@ -1,0 +1,9 @@
+{
+  "name": "google-trends-scraper",
+  "version": "1.0",
+  "buildTag": "latest",
+  "env": null,
+  "defaultRunOptions": {
+    "build": "latest"
+  }
+}

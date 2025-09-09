@@ -1,0 +1,53 @@
+{
+  "title": "Google Trends Scraper (Daily & Realtime)",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "mode": {
+      "title": "Mode",
+      "type": "string",
+      "enum": ["realtime", "daily"],
+      "default": "realtime",
+      "description": "Gerçek zamanlı (realtime) trendler veya günlük (daily) trendler"
+    },
+    "geo": {
+      "title": "Ülke (geo)",
+      "type": "string",
+      "default": "TR",
+      "description": "Ülke kodu (örn: TR, US, DE)"
+    },
+    "hl": {
+      "title": "Dil (hl)",
+      "type": "string",
+      "default": "tr",
+      "description": "Dil (örn: tr, en)"
+    },
+    "tz": {
+      "title": "Zaman dilimi ofseti (dk)",
+      "type": "integer",
+      "default": 180,
+      "description": "Dakika cinsinden timezone ofseti (TR için 180)"
+    },
+    "category": {
+      "title": "Kategori (realtime)",
+      "type": "string",
+      "default": "all",
+      "description": "Realtime için kategori (genellikle 'all')"
+    },
+    "recordsPerInterval": {
+      "title": "Kayıt limiti (ri, realtime)",
+      "type": "integer",
+      "default": 300,
+      "minimum": 1,
+      "description": "Realtime endpoint'inde kaç kayıt çekileceği"
+    },
+    "recentSeconds": {
+      "title": "Son X saniye (rs, realtime)",
+      "type": "integer",
+      "default": 20,
+      "minimum": 1,
+      "description": "Realtime endpoint'inde zaman penceresi"
+    }
+  },
+  "required": ["mode", "geo", "hl", "tz"]
+}
